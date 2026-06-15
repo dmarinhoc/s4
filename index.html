@@ -13,15 +13,17 @@
      =================================================================== */
 
   :root{
-    --verde-bracell: #0F6E56;   /* verde principal (cabeçalho, botões)  */
-    --verde-escuro:  #04342C;   /* texto sobre verde claro              */
-    --verde-claro:   #E1F5EE;   /* fundo de balões e sugestões          */
-    --verde-medio:   #9FE1CB;   /* bordas suaves                        */
-    --verde-vivo:    #97C459;   /* detalhe / indicador online           */
-    --cinza-fundo:   #F4F5F3;
-    --cinza-borda:   #E2E5E1;
-    --texto:         #1d211f;
-    --texto-suave:   #5f6b66;
+    /* Paleta oficial Bracell (Corporate Identity Guide) */
+    --azul-bracell:  #0047BA;   /* azul primário — cabeçalho, botões    */
+    --azul-escuro:   #00337A;   /* hover do azul                        */
+    --azul-claro:    #EAF1FC;   /* fundo de sugestões                   */
+    --azul-borda:    #C5D9F5;   /* bordas suaves                        */
+    --azul-suave:    #BBD0F2;   /* texto claro sobre o azul             */
+    --verde-bracell: #A4D55D;   /* verde de destaque (folha/indicador)  */
+    --cinza-fundo:   #F4F5F7;
+    --cinza-borda:   #E3E6EB;
+    --texto:         #333333;   /* preto 80% (padrão Bracell)           */
+    --texto-suave:   #6B7280;
     --branco:        #ffffff;
   }
 
@@ -38,31 +40,25 @@
 
   /* ---------- Cabeçalho ---------- */
   header{
-    background: var(--verde-bracell);
+    background: var(--azul-bracell);
     color: #fff;
     padding: 14px 18px;
     display: flex;
     align-items: center;
     gap: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,.10);
     z-index: 2;
   }
-  .logo{
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    background: var(--verde-claro);
-    color: var(--verde-escuro);
-    display:flex; align-items:center; justify-content:center;
-    font-weight: 700; font-size: 17px;
-    flex-shrink: 0;
-    /* Para usar o logo da Bracell, troque por:
-       background: url('logo-bracell.png') center/cover; e apague o texto "S4" no HTML */
+  .logo-img{
+    height: 28px; width: auto; display: block; flex-shrink: 0;
+    /* Logo oficial Bracell (versão Reversed white) */
   }
+  .divisor{ width:1px; height:30px; background: rgba(255,255,255,.35); flex-shrink:0; }
   header .titulo{ flex:1; min-width:0; }
-  header .titulo h1{ margin:0; font-size: 18px; font-weight: 600; }
-  header .titulo p{ margin:2px 0 0; font-size: 12.5px; color: var(--verde-medio); }
-  .online{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--verde-medio); }
-  .online .dot{ width:9px; height:9px; border-radius:50%; background: var(--verde-vivo); }
+  header .titulo h1{ margin:0; font-size: 17px; font-weight: 600; }
+  header .titulo p{ margin:2px 0 0; font-size: 12.5px; color: var(--azul-suave); }
+  .online{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--azul-suave); }
+  .online .dot{ width:9px; height:9px; border-radius:50%; background: var(--verde-bracell); }
 
   /* ---------- Área de conversa ---------- */
   .chat{
@@ -92,18 +88,18 @@
   }
   .balao.user{
     align-self: flex-end;
-    background: var(--verde-bracell);
+    background: var(--azul-bracell);
     color: #fff;
     border-bottom-right-radius: 4px;
   }
-  .balao.bot strong{ color: var(--verde-bracell); }
-  .balao.bot a{ color: var(--verde-bracell); font-weight:600; }
+  .balao.bot strong{ color: var(--azul-bracell); }
+  .balao.bot a{ color: var(--azul-bracell); font-weight:600; }
 
   /* indicador "digitando…" */
   .digitando{ display:flex; gap:5px; align-items:center; padding: 14px 18px !important; }
   .digitando span{
     width:8px; height:8px; border-radius:50%;
-    background: var(--verde-medio);
+    background: #9DBDEE;
     animation: pisca 1.2s infinite ease-in-out;
   }
   .digitando span:nth-child(2){ animation-delay: .2s; }
@@ -117,15 +113,15 @@
   .chips{ align-self: flex-start; display:flex; flex-wrap:wrap; gap:8px; max-width: 95%; }
   .chip{
     font-size: 13.5px;
-    background: var(--verde-claro);
-    color: var(--verde-bracell);
-    border: 1px solid var(--verde-medio);
+    background: var(--azul-claro);
+    color: var(--azul-bracell);
+    border: 1px solid var(--azul-borda);
     padding: 7px 14px;
     border-radius: 18px;
     cursor: pointer;
     transition: background .15s;
   }
-  .chip:hover{ background: var(--verde-medio); }
+  .chip:hover{ background: #D6E4FA; }
 
   /* respostas relacionadas */
   .relacionadas{ margin-top:10px; padding-top:10px; border-top:1px solid var(--cinza-borda); }
@@ -150,16 +146,16 @@
     font-family: inherit;
     outline: none;
   }
-  #campo:focus{ border-color: var(--verde-bracell); }
+  #campo:focus{ border-color: var(--azul-bracell); }
   #enviar{
     width: 44px; height: 44px;
     border:none; border-radius:50%;
-    background: var(--verde-bracell);
+    background: var(--azul-bracell);
     color:#fff; font-size:20px; cursor:pointer;
     display:flex; align-items:center; justify-content:center;
     flex-shrink:0;
   }
-  #enviar:hover{ background: #0c5a47; }
+  #enviar:hover{ background: var(--azul-escuro); }
   .rodape{ text-align:center; font-size:11.5px; color:var(--texto-suave); margin-top:8px; }
 
   /* scrollbar discreta */
@@ -170,10 +166,11 @@
 <body>
 
   <header>
-    <div class="logo">S4</div>
+    <img class="logo-img" src="logo-bracell-branco.png" alt="Bracell">
+    <div class="divisor"></div>
     <div class="titulo">
       <h1>S4 Sync Agent</h1>
-      <p>Assistente da migração SAP S4 HANA · Bracell</p>
+      <p>Assistente da migração SAP S4 HANA</p>
     </div>
     <div class="online"><span class="dot"></span> Online</div>
   </header>
