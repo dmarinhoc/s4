@@ -443,11 +443,14 @@ function buscarKeyUsers(texto){
 }
 
 function htmlKeyUsers(seg){
-  const linhas = KEYUSERS[seg].map(function(p){
+  const pessoas = KEYUSERS[seg];
+  const temEmail = pessoas.some(function(p){ return KU_EMAIL[p]; });
+  const linhas = pessoas.map(function(p){
     const e = KU_EMAIL[p];
     return e ? ("• <strong>" + p + "</strong> — <a href=\"mailto:" + e + "\">" + e + "</a>") : ("• " + p);
   }).join("\n");
-  return "Key Users / pontos focais de <strong>" + seg + "</strong>:\n\n" + linhas +
+  const nota = temEmail ? "" : "\n\n<em>(Os e-mails desta área ainda não constam na base — confirme no diretório da Bracell.)</em>";
+  return "Key Users / pontos focais de <strong>" + seg + "</strong>:\n\n" + linhas + nota +
     "\n\nAcione primeiro o Key User da sua área — ele valida a dúvida e abre o chamado com evidências.";
 }
 
@@ -590,6 +593,8 @@ function formatarAI(txt){
    2) Base de palavras-chave com match forte -> resposta instantânea
    3) IA (se configurada e online) para perguntas "tortas"/sem match forte
    4) Fallback sem IA: melhor da base, depois área, depois mensagem padrão */
+let aguardandoArea = false;   /* true logo após perguntar "de qual área?" */
+
 async function responder(texto){
   texto = (texto || "").trim();
   if (!texto) return;
@@ -598,13 +603,26 @@ async function responder(texto){
   campo.value = "";
 
   const u = normalizar(texto);
+  const eraAguardandoArea = aguardandoArea;
+  aguardandoArea = false;
 
-  /* 1) Key Users — sempre local */
+  /* 1) Key Users — pedido explícito (sempre local) */
   if (temIntentKU(u)){
     const seg = buscarKeyUsers(texto);
-    if (seg) animarResposta(htmlKeyUsers(seg), null, null);
-    else animarResposta(htmlAskArea(), SEG_DESTAQUE.map(function(s){ return { pergunta: s }; }), null);
+    if (seg){
+      animarResposta(htmlKeyUsers(seg), null, null);
+    } else {
+      aguardandoArea = true;
+      animarResposta(htmlAskArea(), SEG_DESTAQUE.map(function(s){ return { pergunta: s }; }), null);
+    }
     return;
+  }
+
+  /* 1b) Acabou de perguntar a área -> interpretar a resposta como a área escolhida */
+  if (eraAguardandoArea){
+    const segArea = buscarKeyUsers(texto);
+    if (segArea){ animarResposta(htmlKeyUsers(segArea), null, null); return; }
+    /* não reconheceu a área: segue o fluxo normal abaixo */
   }
 
   /* 2) Base com match forte */
