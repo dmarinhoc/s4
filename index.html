@@ -508,6 +508,21 @@ function htmlAskArea(){
   return "De qual área você precisa do Key User? 🧭\n\nDigite o nome da área (ex.: Financeiro, Fiscal, Manutenção, Suprimentos) ou toque em uma abaixo:";
 }
 
+/* intenção de "listar as áreas" (quais áreas existem) */
+const KU_LISTA_INTENT = ["quais areas","quais as areas","que areas","quais sao as areas","lista de areas","listar areas","todas as areas","ver todas as areas","areas disponiveis","quais setores","lista areas"];
+function pedeListaAreas(u){ return KU_LISTA_INTENT.some(function(k){ return u.indexOf(k) !== -1; }); }
+
+/* nome exato de uma área (ex.: clique num chip) */
+function areaExata(texto){
+  const u = normalizar(texto);
+  for (const seg in KEYUSERS){ if (normalizar(seg) === u) return seg; }
+  return null;
+}
+
+function htmlListaAreas(){
+  return "Tenho Key Users / pontos focais nestas áreas. Toque em uma para ver quem são:";
+}
+
 /* ⬆️ FIM DA BASE DE PERGUNTAS — daqui pra baixo é o funcionamento ⬆️
    (não precisa mexer no resto, a não ser que queira mudar o comportamento)
    =================================================================== */
@@ -656,6 +671,18 @@ async function responder(texto){
   const eraAguardandoArea = aguardandoArea;
   aguardandoArea = false;
 
+  /* 0) Nome exato de uma área (ex.: clique num chip) -> lista os Key Users */
+  const segExata = areaExata(texto);
+  if (segExata){ animarResposta(htmlKeyUsers(segExata), null, null); return; }
+
+  /* 0b) Pediu a lista de áreas -> mostra todas como botões clicáveis */
+  if (pedeListaAreas(u)){
+    aguardandoArea = true;
+    const todas = Object.keys(KEYUSERS).map(function(s){ return { pergunta: s }; });
+    animarResposta(htmlListaAreas(), todas, null);
+    return;
+  }
+
   /* 1) Key Users — pedido explícito (sempre local) */
   if (temIntentKU(u)){
     const seg = buscarKeyUsers(texto);
@@ -663,7 +690,9 @@ async function responder(texto){
       animarResposta(htmlKeyUsers(seg), null, null);
     } else {
       aguardandoArea = true;
-      animarResposta(htmlAskArea(), SEG_DESTAQUE.map(function(s){ return { pergunta: s }; }), null);
+      const chipsArea = SEG_DESTAQUE.map(function(s){ return { pergunta: s }; });
+      chipsArea.push({ pergunta: "Ver todas as áreas" });
+      animarResposta(htmlAskArea(), chipsArea, null);
     }
     return;
   }
