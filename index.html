@@ -314,6 +314,12 @@ const PERGUNTAS = [
     categoria: "Suporte"
   },
   {
+    pergunta: "Quem é o Key User da minha área?",
+    chaves: "key user, keyuser, ponto focal, pontos focais, ponto de apoio, quem procuro na minha area, responsavel pela area, suporte da area, key user da area",
+    resposta: "Digite o nome da sua área (ex.: Financeiro, Fiscal, Manutenção, Suprimentos) que eu te mostro os Key Users / pontos focais responsáveis.",
+    categoria: "Suporte"
+  },
+  {
     pergunta: "Como abro um chamado durante o Go Live?",
     chaves: "chamado, abrir chamado, erro no sistema, problema producao, suporte go live, escalonamento, reportar erro, incidente, bug, ticket, deu erro, sistema com erro",
     resposta: "O suporte segue uma escada:\n\n1. Usuário aciona o <strong>Key User da sua área</strong>\n2. Key User valida e abre o chamado <strong>com evidências</strong>\n3. TI classifica e direciona (funcional/técnico)\n4. Consultoria atua na solução\n5. Retorno é comunicado pelo chamado\n6. Key User valida e fecha\n\nAo reportar um erro, sempre inclua: <strong>descrição do erro, prints e evidências</strong> (logs, mensagens, horários e usuários impactados).",
@@ -339,6 +345,108 @@ const SEM_RESPOSTA =
 
 /* Quantas sugestões mostrar no início e nas relacionadas */
 const QTD_SUGESTOES = 4;
+
+/* ===================================================================
+   KEY USERS / PONTOS FOCAIS POR ÁREA (extraído do comunicado de go-live)
+   Para adicionar/editar uma pessoa, encontre a área e ajuste a lista.
+   Emails conhecidos ficam em KU_EMAIL logo abaixo.
+   =================================================================== */
+const KEYUSERS = {
+  "Suprimentos (Compras)": ["Humberto Menezes","Jaqueline Prandini","Rodrigo Vieira de Carvalho"],
+  "Suprimentos MDM (Cadastros)": ["Karina Belli","Joao Guilherme Dos Santos De Jesus","Luiz Roberto Chaves Gomes"],
+  "Almoxarifado": ["Paulo Francisco","Bruno Sonego","Daniel Magalhães","Enio Carlos Garcia"],
+  "Financeiro": ["Carla Oliveira","Sara Noronha","Mariana Silva","Matheus Bernardes","Aline Salles","Ariadne Vilar","Bruno Gianelli"],
+  "Fiscal": ["Bruno Godoy","João Victor Ramos","Letícia Piassalonga","Stefanie Laurie Crispim Elias","Laryssa Nakayama","Lucas Vieira","Priscila Ferreira","Raquel D.B. de Souza","Andrea de Souza Ribeiro"],
+  "Contábil": ["Mariana Ribeiro","Vanessa Coneglian","Alef Ricardo Silva"],
+  "Contábil Campinas": ["Caroline Trombini"],
+  "Controladoria Capex, Industrial e Tissue": ["Romerson Simão"],
+  "Controladoria Florestal": ["Claudio Monchelato","Natalia Calderon"],
+  "Backlog NF": ["Deivid Macalliste Silva","Gabriela Stefani Guedes de Souza","Matheus Silva Costa","Luciana Mara Zeni","Gusthavo Henrique Magalhaes"],
+  "Manutenção": ["Denilson Ubeda","Christiano Conti","Ramon Bonfim Souza"],
+  "Logística": ["Mauricio Valadares","Robson Mondeck"],
+  "Energia": ["Alessandra Ferreira de Oliveira"],
+  "Produção Celulose": ["Anderson P. dos Santos","Ediza Galli","Giliarde Pereira"],
+  "Produção Tissue": ["Vinicius de Almeida","Maria Fernanda Rodrigues"],
+  "Qualidade Celulose": ["Thais Graça","Suzane Cristina Fidelis"],
+  "Qualidade Tissue": ["Ana Carolina Carvalho"],
+  "Comercial Celulose": ["Enzo Pacola","Mustafa Umut Kafadar"],
+  "Comercial Tissue": ["Sergio Junior","Nara Silva"],
+  "Cadastros Tissue": ["Jonatha Muller"],
+  "Florestal": ["Renan Salgado Silva"],
+  "Terras": ["Kleber Ferreira"],
+  "Porto de Santos": ["Fabricio Tauyl"],
+  "LES": ["Helton Ishii"],
+  "PMO": ["Larissa Rosa Prudenciati"],
+  "RH": ["Larissa Luana Felix"],
+  "RH Facilities": ["Paulo Ricardo Rodrigues Gois"],
+  "Automotiva Full Service": ["Anselmo Rodrigo Mariano"],
+  "Automotiva Manutenção": ["Luiz Roberto Rodrigues Filho","Victor Benjamin"],
+  "Autoposto": ["Michel Jose Da Silva Moreno"],
+  "Turvinho": ["Herika Manfrin","Osmael Auzebio Sant Ana"],
+  "TI Abap": ["Evandro Matias","João Vitor Santanna Teixeira"],
+  "TI BP": ["Augusto Cardoso","Edgard Lavras","Evelyn Silva Nobre","Josue Borges","Rosangela Almeida","Tatiane Lopes Fernandes"],
+  "TI BW": ["Roseane Dos Santos De Almeida"],
+  "TI Cutover": ["Fausto Simonetti"],
+  "TI GP": ["Andreia Rodrigues"],
+  "TI GRS": ["Denner de Andrade"],
+  "TI MDM": ["Luiz Fernando Reginatto Martins","Alvaro Santos","Romulo Gimenez"],
+  "TI QA": ["Leandro Gonçalves","Lucia Sasaki","Oswaldo Cerchiari","Valeska Torrezan Bitler","Douglas Marques Silva"],
+  "TI Perfis (acessos)": ["Jorge Albuquerque"]
+};
+
+/* e-mails conhecidos (Compras/Suprimentos) */
+const KU_EMAIL = {
+  "Humberto Menezes": "Humberto_Menezes@bracell.com",
+  "Jaqueline Prandini": "jmprandini@bracell.com",
+  "Rodrigo Vieira de Carvalho": "rocarvalho@bracell.com"
+};
+
+/* sinônimos que apontam para uma área */
+const KU_ALIAS = {
+  "Suprimentos (Compras)": "compras comprador compradores suprimentos suprimento aquisicao procurement",
+  "Suprimentos MDM (Cadastros)": "mdm cadastro cadastros material fornecedor bp",
+  "Financeiro": "financeiro pagamento pagamentos tesouraria",
+  "Fiscal": "fiscal nota notas imposto impostos tributario nf",
+  "Contábil": "contabil contabilidade contabeis",
+  "Manutenção": "manutencao",
+  "Logística": "logistica transporte frete",
+  "Produção Celulose": "producao celulose",
+  "Produção Tissue": "producao tissue papel",
+  "Almoxarifado": "almoxarifado estoque deposito",
+  "TI Perfis (acessos)": "acesso acessos perfil perfis autorizacao permissao"
+};
+
+const KU_INTENT = ["key user","keyuser","key-user","ponto focal","pontos focais","ponto de apoio","quem e o key","key users","keyusers"];
+const SEG_DESTAQUE = ["Suprimentos (Compras)","Financeiro","Fiscal","Contábil","Manutenção","Produção Celulose"];
+const KU_STOP = ["de","da","do","na","no","em","os","as","um","uma","key","user","ponto","focal","pontos","focais","apoio","quem","area","minha","sua","qual","com","para","meu"];
+
+function temIntentKU(u){ return KU_INTENT.some(k => u.indexOf(k) !== -1); }
+
+function buscarKeyUsers(texto){
+  const u = normalizar(texto);
+  const tokens = u.split(" ").filter(t => t.length >= 2 && KU_STOP.indexOf(t) === -1);
+  let best = null, bestScore = 0;
+  for (const seg in KEYUSERS){
+    const alvo = normalizar(seg + " " + (KU_ALIAS[seg] || ""));
+    let score = 0;
+    tokens.forEach(t => { if (alvo.indexOf(t) !== -1) score += 1; });
+    if (score > bestScore){ bestScore = score; best = seg; }
+  }
+  return bestScore > 0 ? best : null;
+}
+
+function htmlKeyUsers(seg){
+  const linhas = KEYUSERS[seg].map(function(p){
+    const e = KU_EMAIL[p];
+    return e ? ("• <strong>" + p + "</strong> — <a href=\"mailto:" + e + "\">" + e + "</a>") : ("• " + p);
+  }).join("\n");
+  return "Key Users / pontos focais de <strong>" + seg + "</strong>:\n\n" + linhas +
+    "\n\nAcione primeiro o Key User da sua área — ele valida a dúvida e abre o chamado com evidências.";
+}
+
+function htmlAskArea(){
+  return "De qual área você precisa do Key User? 🧭\n\nDigite o nome da área (ex.: Financeiro, Fiscal, Manutenção, Suprimentos) ou toque em uma abaixo:";
+}
 
 /* ⬆️ FIM DA BASE DE PERGUNTAS — daqui pra baixo é o funcionamento ⬆️
    (não precisa mexer no resto, a não ser que queira mudar o comportamento)
@@ -432,7 +540,12 @@ function mostrarDigitando(){
   return div;
 }
 
-/* fluxo principal: usuário pergunta, S4 Sync Agent responde */
+/* fluxo principal: usuário pergunta, S4 Sync Agent responde.
+   Ordem de decisão:
+   1) Pediu explicitamente "key user/ponto focal" -> lista da área (ou pergunta a área)
+   2) Pergunta frequente (FAQ)
+   3) Sem FAQ, mas o texto bate com uma área -> lista de Key Users
+   4) Nada encontrado -> mensagem padrão */
 function responder(texto){
   texto = (texto || "").trim();
   if (!texto) return;
@@ -440,31 +553,43 @@ function responder(texto){
   balao('user', escapar(texto));
   campo.value = "";
 
-  const resultados = buscar(texto);
+  const u = normalizar(texto);
+  let respHtml = "", chipsLista = null, chipsRotulo = null;
+
+  if (temIntentKU(u)){
+    const seg = buscarKeyUsers(texto);
+    if (seg){
+      respHtml = htmlKeyUsers(seg);
+    } else {
+      respHtml = htmlAskArea();
+      chipsLista = SEG_DESTAQUE.map(function(s){ return { pergunta: s }; });
+    }
+  } else {
+    const resultados = buscar(texto);
+    if (resultados.length > 0){
+      respHtml = resultados[0].item.resposta;
+      const outras = resultados.slice(1, QTD_SUGESTOES + 1).map(function(r){ return r.item; });
+      if (outras.length > 0){ chipsLista = outras; chipsRotulo = "Veja também:"; }
+    } else {
+      const seg2 = buscarKeyUsers(texto);
+      if (seg2){
+        respHtml = htmlKeyUsers(seg2);
+      } else {
+        respHtml = SEM_RESPOSTA;
+        chipsLista = PERGUNTAS.slice(0, QTD_SUGESTOES);
+        chipsRotulo = "Talvez uma destas ajude:";
+      }
+    }
+  }
 
   /* tempo proporcional ao tamanho da resposta, dentro dos limites */
-  const respostaTexto = resultados.length ? resultados[0].item.resposta : SEM_RESPOSTA;
-  const espera = Math.min(ESPERA_MAX, Math.max(ESPERA_MIN, respostaTexto.length * 9));
-
+  const espera = Math.min(ESPERA_MAX, Math.max(ESPERA_MIN, respHtml.length * 9));
   const digitando = mostrarDigitando();
 
   setTimeout(() => {
     digitando.remove();
-
-    if (resultados.length === 0){
-      balao('bot', escapar(SEM_RESPOSTA).replace(/\n/g, "<br>"));
-      chips(PERGUNTAS.slice(0, QTD_SUGESTOES), "Talvez uma destas ajude:");
-      return;
-    }
-
-    const melhor = resultados[0].item;
-    balao('bot', melhor.resposta.replace(/\n/g, "<br>"));
-
-    /* mostra outras relacionadas, se houver */
-    const outras = resultados.slice(1, QTD_SUGESTOES + 1).map(r => r.item);
-    if (outras.length > 0){
-      chips(outras, "Veja também:");
-    }
+    balao('bot', respHtml.replace(/\n/g, "<br>"));
+    if (chipsLista){ chips(chipsLista, chipsRotulo); }
   }, espera);
 }
 
