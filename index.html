@@ -475,7 +475,7 @@ const KU_ALIAS = {
 
 const KU_INTENT = ["key user","keyuser","key-user","ponto focal","pontos focais","ponto de apoio","quem e o key","key users","keyusers"];
 const SEG_DESTAQUE = ["Suprimentos (Compras)","Financeiro","Fiscal","Contábil","Manutenção","Produção Celulose"];
-const KU_STOP = ["de","da","do","na","no","em","os","as","um","uma","key","user","ponto","focal","pontos","focais","apoio","quem","area","minha","sua","qual","com","para","meu"];
+const KU_STOP = ["de","da","do","na","no","em","os","as","um","uma","key","user","ponto","focal","pontos","focais","apoio","quem","area","areas","minha","sua","qual","quais","com","para","meu","das","dos","setor","setores","cada","todas","todos","sao","envolvidos","projeto","lista","existem","tem","tudo"];
 
 function temIntentKU(u){ return KU_INTENT.some(k => u.indexOf(k) !== -1); }
 
@@ -484,9 +484,10 @@ function buscarKeyUsers(texto){
   const tokens = u.split(" ").filter(t => t.length >= 2 && KU_STOP.indexOf(t) === -1);
   let best = null, bestScore = 0;
   for (const seg in KEYUSERS){
-    const alvo = normalizar(seg + " " + (KU_ALIAS[seg] || ""));
+    /* casa PALAVRA INTEIRA (evita "das" achar match em "cadastros") */
+    const palavrasAlvo = normalizar(seg + " " + (KU_ALIAS[seg] || "")).split(" ");
     let score = 0;
-    tokens.forEach(t => { if (alvo.indexOf(t) !== -1) score += 1; });
+    tokens.forEach(t => { if (palavrasAlvo.indexOf(t) !== -1) score += 1; });
     if (score > bestScore){ bestScore = score; best = seg; }
   }
   return bestScore > 0 ? best : null;
@@ -509,7 +510,7 @@ function htmlAskArea(){
 }
 
 /* intenção de "listar as áreas" (quais áreas existem) */
-const KU_LISTA_INTENT = ["quais areas","quais as areas","que areas","quais sao as areas","lista de areas","listar areas","todas as areas","ver todas as areas","areas disponiveis","quais setores","lista areas"];
+const KU_LISTA_INTENT = ["quais areas","quais as areas","que areas","quais sao as areas","lista de areas","listar areas","todas as areas","ver todas as areas","areas disponiveis","quais setores","lista areas","das areas","por area","de cada area","areas com","keyusers das","key users das","keyusers por","key users por"];
 function pedeListaAreas(u){ return KU_LISTA_INTENT.some(function(k){ return u.indexOf(k) !== -1; }); }
 
 /* nome exato de uma área (ex.: clique num chip) */
