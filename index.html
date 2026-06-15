@@ -346,6 +346,13 @@ const SEM_RESPOSTA =
 /* Quantas sugestões mostrar no início e nas relacionadas */
 const QTD_SUGESTOES = 4;
 
+/* ===== IA (opcional) =====
+   Deixe AI_ENDPOINT vazio para desligar a IA (o app funciona só com a base).
+   Quando o "porteiro" (Cloudflare Worker) estiver pronto, cole a URL dele aqui.
+   A IA só é consultada quando a base de palavras-chave NÃO acha algo forte. */
+const AI_ENDPOINT = "";
+const FAQ_FORTE = 4;   /* pontuação mínima da base para responder sem IA */
+
 /* ===================================================================
    KEY USERS / PONTOS FOCAIS POR ÁREA (extraído do comunicado de go-live)
    Para adicionar/editar uma pessoa, encontre a área e ajuste a lista.
@@ -540,13 +547,50 @@ function mostrarDigitando(){
   return div;
 }
 
-/* fluxo principal: usuário pergunta, S4 Sync Agent responde.
-   Ordem de decisão:
-   1) Pediu explicitamente "key user/ponto focal" -> lista da área (ou pergunta a área)
-   2) Pergunta frequente (FAQ)
-   3) Sem FAQ, mas o texto bate com uma área -> lista de Key Users
-   4) Nada encontrado -> mensagem padrão */
-function responder(texto){
+/* mostra a resposta do bot com o "digitando…" e um tempo natural */
+function animarResposta(respHtml, chipsLista, chipsRotulo){
+  const espera = Math.min(ESPERA_MAX, Math.max(ESPERA_MIN, respHtml.length * 9));
+  const digitando = mostrarDigitando();
+  setTimeout(() => {
+    digitando.remove();
+    balao('bot', respHtml.replace(/\n/g, "<br>"));
+    if (chipsLista){ chips(chipsLista, chipsRotulo); }
+  }, espera);
+}
+
+/* consulta a IA (porteiro). Retorna texto ou null se indisponível/erro. */
+async function callAI(pergunta){
+  if (!AI_ENDPOINT) return null;
+  try{
+    const ctrl = new AbortController();
+    const timer = setTimeout(function(){ ctrl.abort(); }, 15000);
+    const r = await fetch(AI_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pergunta: pergunta }),
+      signal: ctrl.signal
+    });
+    clearTimeout(timer);
+    if (!r.ok) return null;
+    const j = await r.json();
+    return (j && j.resposta && j.resposta.trim()) ? j.resposta.trim() : null;
+  }catch(e){ return null; }
+}
+
+/* formata a resposta da IA com segurança (escapa HTML, vira links, negrito) */
+function formatarAI(txt){
+  let s = escapar(txt);
+  s = s.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>');
+  s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  return s.replace(/\n/g, "<br>");
+}
+
+/* fluxo principal. Ordem de decisão:
+   1) Pediu "key user/ponto focal" -> lista local (NUNCA vai para a IA)
+   2) Base de palavras-chave com match forte -> resposta instantânea
+   3) IA (se configurada e online) para perguntas "tortas"/sem match forte
+   4) Fallback sem IA: melhor da base, depois área, depois mensagem padrão */
+async function responder(texto){
   texto = (texto || "").trim();
   if (!texto) return;
 
@@ -554,43 +598,44 @@ function responder(texto){
   campo.value = "";
 
   const u = normalizar(texto);
-  let respHtml = "", chipsLista = null, chipsRotulo = null;
 
+  /* 1) Key Users — sempre local */
   if (temIntentKU(u)){
     const seg = buscarKeyUsers(texto);
-    if (seg){
-      respHtml = htmlKeyUsers(seg);
-    } else {
-      respHtml = htmlAskArea();
-      chipsLista = SEG_DESTAQUE.map(function(s){ return { pergunta: s }; });
-    }
-  } else {
-    const resultados = buscar(texto);
-    if (resultados.length > 0){
-      respHtml = resultados[0].item.resposta;
-      const outras = resultados.slice(1, QTD_SUGESTOES + 1).map(function(r){ return r.item; });
-      if (outras.length > 0){ chipsLista = outras; chipsRotulo = "Veja também:"; }
-    } else {
-      const seg2 = buscarKeyUsers(texto);
-      if (seg2){
-        respHtml = htmlKeyUsers(seg2);
-      } else {
-        respHtml = SEM_RESPOSTA;
-        chipsLista = PERGUNTAS.slice(0, QTD_SUGESTOES);
-        chipsRotulo = "Talvez uma destas ajude:";
-      }
-    }
+    if (seg) animarResposta(htmlKeyUsers(seg), null, null);
+    else animarResposta(htmlAskArea(), SEG_DESTAQUE.map(function(s){ return { pergunta: s }; }), null);
+    return;
   }
 
-  /* tempo proporcional ao tamanho da resposta, dentro dos limites */
-  const espera = Math.min(ESPERA_MAX, Math.max(ESPERA_MIN, respHtml.length * 9));
-  const digitando = mostrarDigitando();
+  /* 2) Base com match forte */
+  const resultados = buscar(texto);
+  if (resultados.length > 0 && resultados[0].pontos >= FAQ_FORTE){
+    const outras = resultados.slice(1, QTD_SUGESTOES + 1).map(function(r){ return r.item; });
+    animarResposta(resultados[0].item.resposta, outras.length ? outras : null, outras.length ? "Veja também:" : null);
+    return;
+  }
 
-  setTimeout(() => {
+  /* 3) IA como fallback para perguntas sem match forte */
+  if (AI_ENDPOINT){
+    const digitando = mostrarDigitando();
+    const aiTxt = await callAI(texto);
     digitando.remove();
-    balao('bot', respHtml.replace(/\n/g, "<br>"));
-    if (chipsLista){ chips(chipsLista, chipsRotulo); }
-  }, espera);
+    if (aiTxt){
+      balao('bot', formatarAI(aiTxt));
+      return;
+    }
+    /* se a IA falhou, segue para o fallback abaixo */
+  }
+
+  /* 4) Fallback sem IA */
+  if (resultados.length > 0){
+    const outras = resultados.slice(1, QTD_SUGESTOES + 1).map(function(r){ return r.item; });
+    animarResposta(resultados[0].item.resposta, outras.length ? outras : null, outras.length ? "Veja também:" : null);
+    return;
+  }
+  const seg2 = buscarKeyUsers(texto);
+  if (seg2){ animarResposta(htmlKeyUsers(seg2), null, null); return; }
+  animarResposta(SEM_RESPOSTA, PERGUNTAS.slice(0, QTD_SUGESTOES), "Talvez uma destas ajude:");
 }
 
 function escapar(t){
