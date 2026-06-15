@@ -18,7 +18,7 @@
    =================================================================== */
 
 const ORIGEM_PERMITIDA = "https://dmarinhoc.github.io";  // só o site oficial pode usar
-const MODELO = "gemini-2.0-flash";                        // modelo gratuito do Gemini
+const MODELOS = ["gemini-2.0-flash", "gemini-1.5-flash"]; // tenta o 1º; se falhar, o 2º
 
 /* Base de conhecimento de PROCESSO — SEM nomes/e-mails de pessoas.
    (contatos e Key Users são respondidos localmente pelo site) */
@@ -104,30 +104,45 @@ export default {
       return new Response(JSON.stringify({ resposta: "" }), { headers: { "Content-Type": "application/json", ...corsHeaders() } });
     }
 
-    const url = "https://generativelanguage.googleapis.com/v1beta/models/" + MODELO + ":generateContent?key=" + env.GEMINI_API_KEY;
+    if (!env.GEMINI_API_KEY){
+      return new Response(JSON.stringify({ resposta: "", _diag: "GEMINI_API_KEY ausente (secret não configurado ou sem Deploy após adicionar)." }), {
+        headers: { "Content-Type": "application/json", ...corsHeaders() }
+      });
+    }
+
     const payload = {
       systemInstruction: { parts: [{ text: INSTRUCAO + "\n\nCONTEXTO:\n" + CONHECIMENTO }] },
       contents: [{ role: "user", parts: [{ text: pergunta }] }],
       generationConfig: { temperature: 0.2, maxOutputTokens: 600 }
     };
 
-    try {
-      const r = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      const j = await r.json();
-      const texto = j && j.candidates && j.candidates[0] && j.candidates[0].content
-        && j.candidates[0].content.parts && j.candidates[0].content.parts[0]
-        ? j.candidates[0].content.parts[0].text : "";
-      return new Response(JSON.stringify({ resposta: texto || "" }), {
-        headers: { "Content-Type": "application/json", ...corsHeaders() }
-      });
-    } catch(e){
-      return new Response(JSON.stringify({ erro: "Falha ao consultar a IA" }), {
-        status: 502, headers: { "Content-Type": "application/json", ...corsHeaders() }
-      });
+    let ultimoDiag = "";
+    for (const modelo of MODELOS){
+      const url = "https://generativelanguage.googleapis.com/v1beta/models/" + modelo + ":generateContent?key=" + env.GEMINI_API_KEY;
+      try {
+        const r = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const j = await r.json();
+        const texto = j && j.candidates && j.candidates[0] && j.candidates[0].content
+          && j.candidates[0].content.parts && j.candidates[0].content.parts[0]
+          ? j.candidates[0].content.parts[0].text : "";
+        if (texto){
+          return new Response(JSON.stringify({ resposta: texto }), {
+            headers: { "Content-Type": "application/json", ...corsHeaders() }
+          });
+        }
+        ultimoDiag = "[" + modelo + "] HTTP " + r.status + " " +
+          (j && j.error ? (j.error.status + ": " + j.error.message)
+                        : (j && j.candidates && j.candidates[0] ? ("finishReason=" + j.candidates[0].finishReason) : "sem candidates"));
+      } catch(e){
+        ultimoDiag = "[" + modelo + "] exceção: " + e.message;
+      }
     }
+    return new Response(JSON.stringify({ resposta: "", _diag: ultimoDiag }), {
+      headers: { "Content-Type": "application/json", ...corsHeaders() }
+    });
   }
 };
