@@ -18,7 +18,9 @@
    =================================================================== */
 
 const ORIGEM_PERMITIDA = "https://dmarinhoc.github.io";  // só o site oficial pode usar
-const MODELOS = ["gemini-2.0-flash", "gemini-1.5-flash"]; // tenta o 1º; se falhar, o 2º
+/* tenta estes na ordem; se nenhum existir, o Worker pergunta à API quais
+   modelos a chave tem e escolhe um "flash" automaticamente */
+const MODELOS = ["gemini-2.0-flash", "gemini-2.5-flash", "gemini-flash-latest"];
 
 /* Base de conhecimento de PROCESSO — SEM nomes/e-mails de pessoas.
    (contatos e Key Users são respondidos localmente pelo site) */
@@ -84,6 +86,41 @@ function corsHeaders(){
   };
 }
 
+/* chama um modelo do Gemini; retorna {texto, diag} */
+async function chamarGemini(modelo, key, payload){
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/" + modelo + ":generateContent?key=" + key;
+  try{
+    const r = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const j = await r.json();
+    const texto = j && j.candidates && j.candidates[0] && j.candidates[0].content
+      && j.candidates[0].content.parts && j.candidates[0].content.parts[0]
+      ? j.candidates[0].content.parts[0].text : "";
+    const diag = "[" + modelo + "] HTTP " + r.status + " " +
+      (j && j.error ? (j.error.status + ": " + j.error.message)
+                    : (j && j.candidates && j.candidates[0] ? ("finishReason=" + j.candidates[0].finishReason) : "sem candidates"));
+    return { texto: texto, diag: diag };
+  }catch(e){
+    return { texto: "", diag: "[" + modelo + "] exceção: " + e.message };
+  }
+}
+
+/* pergunta à API quais modelos "flash" a chave tem e suportam generateContent */
+async function descobrirModelosFlash(key){
+  try{
+    const r = await fetch("https://generativelanguage.googleapis.com/v1beta/models?key=" + key + "&pageSize=200");
+    const j = await r.json();
+    if (!j || !j.models) return [];
+    return j.models
+      .filter(function(m){ return m.supportedGenerationMethods && m.supportedGenerationMethods.indexOf("generateContent") !== -1; })
+      .map(function(m){ return m.name.replace("models/", ""); })
+      .filter(function(n){ return n.indexOf("flash") !== -1 && n.indexOf("thinking") === -1; });
+  }catch(e){ return []; }
+}
+
 export default {
   async fetch(request, env){
     if (request.method === "OPTIONS"){
@@ -116,32 +153,38 @@ export default {
       generationConfig: { temperature: 0.2, maxOutputTokens: 600 }
     };
 
-    let ultimoDiag = "";
+    const diags = [];
+
+    /* 1) tenta os modelos preferidos */
     for (const modelo of MODELOS){
-      const url = "https://generativelanguage.googleapis.com/v1beta/models/" + modelo + ":generateContent?key=" + env.GEMINI_API_KEY;
-      try {
-        const r = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+      const res = await chamarGemini(modelo, env.GEMINI_API_KEY, payload);
+      if (res.texto){
+        return new Response(JSON.stringify({ resposta: res.texto }), {
+          headers: { "Content-Type": "application/json", ...corsHeaders() }
         });
-        const j = await r.json();
-        const texto = j && j.candidates && j.candidates[0] && j.candidates[0].content
-          && j.candidates[0].content.parts && j.candidates[0].content.parts[0]
-          ? j.candidates[0].content.parts[0].text : "";
-        if (texto){
-          return new Response(JSON.stringify({ resposta: texto }), {
-            headers: { "Content-Type": "application/json", ...corsHeaders() }
-          });
-        }
-        ultimoDiag = "[" + modelo + "] HTTP " + r.status + " " +
-          (j && j.error ? (j.error.status + ": " + j.error.message)
-                        : (j && j.candidates && j.candidates[0] ? ("finishReason=" + j.candidates[0].finishReason) : "sem candidates"));
-      } catch(e){
-        ultimoDiag = "[" + modelo + "] exceção: " + e.message;
       }
+      diags.push(res.diag);
     }
-    return new Response(JSON.stringify({ resposta: "", _diag: ultimoDiag }), {
+
+    /* 2) nenhum funcionou -> descobre os modelos da chave e tenta o primeiro flash */
+    const disponiveis = await descobrirModelosFlash(env.GEMINI_API_KEY);
+    for (const modelo of disponiveis){
+      if (MODELOS.indexOf(modelo) !== -1) continue;
+      const res = await chamarGemini(modelo, env.GEMINI_API_KEY, payload);
+      if (res.texto){
+        return new Response(JSON.stringify({ resposta: res.texto }), {
+          headers: { "Content-Type": "application/json", ...corsHeaders() }
+        });
+      }
+      diags.push(res.diag);
+      break; /* tenta só o primeiro descoberto para não gastar cota à toa */
+    }
+
+    return new Response(JSON.stringify({
+      resposta: "",
+      _diag: diags.join(" | "),
+      _modelos_disponiveis: disponiveis
+    }), {
       headers: { "Content-Type": "application/json", ...corsHeaders() }
     });
   }
