@@ -69,6 +69,11 @@ SUPORTE / CHAMADOS NO GO LIVE:
 IMPORTAÇÕES / MRO:
 - ~95% das importações são com pagamento antecipado.
 - Pagamento ao fornecedor internacional para liberar embarque: até 20/05/2026. Embarques aéreos: até 30/05/2026. Embarques marítimos fora de curso: 1ª quinzena de julho/2026.
+
+DIVERGÊNCIA DE NF EM MATERIAL/SERVIÇO CRÍTICO DURANTE O FREEZING (período de paralisação/blackout) — por erro no pedido, cadastro de material, IVA etc.:
+- Se JÁ EXISTE pedido de compra emitido e a NF está com o time fiscal para lançamento: havendo divergência no pedido, o time de Task Force (Backlog NF) possui acesso às transações de alteração e atua diretamente na tratativa.
+- Se NÃO EXISTE pedido de compra e é necessário pagar o fornecedor: o alinhamento deve ser feito diretamente com o time financeiro, que orienta o procedimento adequado.
+- Para situações emergenciais: o requisitante formaliza a solicitação pelo formulário do Plano de Contingência.
 `;
 
 const INSTRUCAO = `Você é o "S4 Sync Agent", assistente da migração SAP S/4HANA da Bracell, que ajuda os COMPRADORES com dúvidas. Responda SEMPRE em português do Brasil, de forma objetiva, prática e amigável, em frases curtas ou tópicos.
