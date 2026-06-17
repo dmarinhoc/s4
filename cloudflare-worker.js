@@ -39,16 +39,30 @@ PLANO DE CONTINGÊNCIA DE COMPRAS (usado só quando o sistema está indisponíve
 - Emissão do pedido após o sistema voltar: anexar o formulário aprovado, e-mail de formalização, propostas técnica e comercial, condições gerais e comprovante ao RH Terceiros; registrar nas observações que é oriundo do Plano de Contingência. A emissão no sistema é obrigatória.
 - A relação do que está em contingência é enviada semanalmente pela equipe do projeto.
 
-DATAS / PRAZOS (ECC = sistema antigo):
-- Criação de requisições de compra (RC) no ECC: até 01/06/2026.
-- Criação de contratos no ECC: até 01/06/2026.
-- Criação de pedidos de compra (PO) no ECC: até 10/06/2026.
-- Bloqueio de novos PO no ECC: a partir de 11/06/2026.
-- Aprovação de documentos RC/PO/CT no ECC: até 13/06/2026 (não aprovados não migram).
-- Blackout ECC: 24/06 a 28/06/2026.
-- Paralisação geral do sistema: 24/06 a 06/07/2026.
-- Liberação parcial do HANA: 01/07 a 03/07/2026. Liberação total do HANA: 03/07 a 06/07/2026.
-- Go Live S/4HANA: 01/07/2026. Retomada do recebimento de notas fiscais: 07/07/2026.
+DATAS / PRAZOS DO CUTOVER (ECC = sistema antigo). Todas as datas são limites "até". Atenção: existem TRÊS datas diferentes ligadas a NF — não confundir:
+- Cadastro (criação/ampliação/alteração) de BPs, materiais e serviços: até 28/05/2026.
+- Criação de requisições de compra (RC): até 01/06/2026.
+- Criação de contratos (CT): até 01/06/2026.
+- Criação de pedidos de compra (PO): até 10/06/2026.
+- Bloqueio de criação de novos PO no ECC: a partir de 11/06/2026.
+- Aprovação de documentos de compra (RC/PO/CT) no ECC: até 13/06/2026 (não aprovados não migram).
+- Solicitação de provisão (fluxo de caixa) para pagamento de fornecedor: até 15/06/2026.
+- Solicitação de antecipação de pagamentos a fornecedores: até 15/06/2026.
+- ENVIO de NF (Insumos/MRO/Serviços/Capex/CTe) para Campinas: até 19/06/2026.
+- Geração de Aviso de Recebimento (AR): até 19/06/2026.
+- ENTRADA de nota fiscal no sistema (NF Insumos/MRO/Serviços/Capex/CTe): até 23/06/2026. (É esta a data quando alguém pergunta "até quando dar entrada / lançar / receber NF no ECC".)
+- Entrada de Faturas/Reembolsos (documentos não fiscais): até 23/06/2026.
+- Apontamento de produção no ECC: até 23/06/2026.
+- Integração da folha de pagamento: de 23/06 a 24/06/2026.
+- Data limite de pagamento: 25/06/2026.
+- Última data de faturamento: 26/06/2026.
+- Fechamento contábil (ECC): de 26/06 a 29/06/2026.
+- Blackout ECC: de 24/06 a 28/06/2026 (a partir de 24/06 acesso só ao time de CO; a partir de 28/06 somente consulta).
+- Blackout e liberação parcial do ambiente HANA (Faturamento e vendas Celulose e Tissue): de 01/07 a 03/07/2026.
+- Liberação total do ambiente HANA: de 03/07 a 06/07/2026.
+- Go Live S/4HANA: 01/07/2026.
+- RETOMADA do recebimento de notas fiscais no novo sistema: 07/07/2026.
+Dica de interpretação: se a dúvida for sobre receber/dar entrada de NF de itens críticos no recebimento físico/almoxarifado, informe a data de ENTRADA de NF (23/06/2026) e sugira confirmar com o Key User da área de Almoxarifado (ou a área responsável pelo item) digitando o nome da área no assistente.
 
 MIGRAÇÃO DE DADOS:
 - RC: emitidas entre 01/01 e 01/06/2026, apenas aprovadas.
@@ -77,11 +91,18 @@ DIVERGÊNCIA DE NF EM MATERIAL/SERVIÇO CRÍTICO DURANTE O FREEZING (período de
 `;
 
 const INSTRUCAO = `Você é o "S4 Sync Agent", assistente da migração SAP S/4HANA da Bracell, que ajuda os COMPRADORES com dúvidas. Responda SEMPRE em português do Brasil, de forma objetiva, prática e amigável, em frases curtas ou tópicos.
+
+Como interpretar:
+- Entenda a INTENÇÃO mesmo que a pergunta esteja mal formulada, curta, com erros de digitação ou sem acentos. Não exija que o usuário formule "do jeito certo".
+- Não responda de forma robótica nem peça para reformular: dê a melhor resposta possível com o que entendeu.
+- Se a pergunta puder se referir a mais de uma data/situação (ex.: NF tem "envio para Campinas" 19/06, "entrada no sistema" 23/06 e "retomada do recebimento" 07/07), entregue a data mais provável para a intenção e mencione brevemente as outras para o usuário se localizar.
+- Quando a dúvida envolver recebimento físico, entrada de material ou item crítico, dê a data e SUGIRA confirmar com o Key User da área pertinente (ex.: Almoxarifado), orientando a digitar o nome da área no assistente para ver quem é.
+
 Regras:
 - Responda APENAS com base no CONTEXTO fornecido. Não invente datas, números, nomes ou links.
-- Se a informação não estiver no contexto, diga que não tem essa informação na base e oriente procurar a equipe de Compras/Suprimentos. NÃO tente adivinhar.
+- Se realmente não houver nada relacionado no contexto, diga que não tem essa informação na base e oriente procurar a equipe de Compras/Suprimentos. Só faça isso como último recurso.
 - Se perguntarem por nomes de pessoas, contatos ou "quem é o Key User", responda que essa informação aparece direto no assistente ao digitar a área (você não tem esses dados aqui).
-- Mantenha links exatamente como estão no contexto.`;
+- Quando a pergunta for sobre o formulário, o documento do plano, ou onde acessar algo, inclua o link correspondente do contexto, exatamente como está.`;
 
 function corsHeaders(){
   return {

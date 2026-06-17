@@ -311,9 +311,9 @@ const PERGUNTAS = [
     categoria: "Migração"
   },
   {
-    pergunta: "Prazos para fornecedores enviarem notas fiscais",
-    chaves: "nota fiscal, nf, fornecedor, prazo nota, enviar nota, recebimento nf, quando enviar nota, suspensao nota, retomada nota, faturamento fornecedor",
-    resposta: "Para os fornecedores das unidades de SP (Industrial, Florestal, Tissue e Auto Posto):\n\n• <strong>Enviar NF até:</strong> 19/06/2026\n• <strong>Recebimento suspenso:</strong> a partir de 19/06/2026\n• <strong>Retomada do recebimento:</strong> 07/07/2026\n\nApós a virada, a NF deve conter o novo número do pedido e o MIGO.",
+    pergunta: "Datas de nota fiscal (envio, entrada e recebimento)",
+    chaves: "nota fiscal, nf, fornecedor, prazo nota, enviar nota, envio de nf, entrada de nf, dar entrada nf, lancar nf, recebimento nf, receber nf, quando enviar nota, suspensao nota, retomada nota, faturamento fornecedor, data nf, prazo nf",
+    resposta: "Atenção: são <strong>três datas diferentes</strong> de NF:\n\n• <strong>Envio de NF para Campinas</strong> (Insumos/MRO/Serviços/Capex/CTe): até <strong>19/06/2026</strong>\n• <strong>Entrada/lançamento da NF no sistema</strong>: até <strong>23/06/2026</strong>\n• <strong>Retomada do recebimento</strong> no novo sistema: <strong>07/07/2026</strong>\n\nSe for sobre receber item no almoxarifado, vale confirmar a data com o Key User de <strong>Almoxarifado</strong> (digite \"almoxarifado\"). Após a virada, a NF deve conter o novo número do pedido e o MIGO.",
     categoria: "Datas"
   },
   {
@@ -529,6 +529,13 @@ function areaExata(texto){
   return null;
 }
 
+/* texto igual a uma pergunta da base (ex.: clique numa sugestão) */
+function perguntaExata(texto){
+  const u = normalizar(texto);
+  for (const item of PERGUNTAS){ if (normalizar(item.pergunta) === u) return item; }
+  return null;
+}
+
 function htmlListaAreas(){
   return "Tenho Key Users / pontos focais nestas áreas. Toque em uma para ver quem são:";
 }
@@ -714,15 +721,15 @@ async function responder(texto){
     /* não reconheceu a área: segue o fluxo normal abaixo */
   }
 
-  /* 2) Base com match forte */
-  const resultados = buscar(texto);
-  if (resultados.length > 0 && resultados[0].pontos >= FAQ_FORTE){
-    const outras = resultados.slice(1, QTD_SUGESTOES + 1).map(function(r){ return r.item; });
-    animarResposta(resultados[0].item.resposta, outras.length ? outras : null, outras.length ? "Veja também:" : null);
+  /* 2) Clique numa sugestão (texto = pergunta da base) -> resposta canônica instantânea */
+  const exata = perguntaExata(texto);
+  if (exata){
+    const rel = buscar(texto).filter(function(r){ return r.item !== exata; }).slice(0, QTD_SUGESTOES).map(function(r){ return r.item; });
+    animarResposta(exata.resposta, rel.length ? rel : null, rel.length ? "Veja também:" : null);
     return;
   }
 
-  /* 3) IA como fallback para perguntas sem match forte */
+  /* 3) IA como cabeça principal para texto livre (interpreta a intenção) */
   if (AI_ENDPOINT){
     const digitando = mostrarDigitando();
     const aiTxt = await callAI(texto);
@@ -731,10 +738,11 @@ async function responder(texto){
       balao('bot', formatarAI(aiTxt));
       return;
     }
-    /* se a IA falhou, segue para o fallback abaixo */
+    /* IA indisponível/erro -> segue para o fallback da base abaixo */
   }
 
-  /* 4) Fallback sem IA */
+  /* 4) Fallback sem IA: melhor da base, depois área, depois mensagem padrão */
+  const resultados = buscar(texto);
   if (resultados.length > 0){
     const outras = resultados.slice(1, QTD_SUGESTOES + 1).map(function(r){ return r.item; });
     animarResposta(resultados[0].item.resposta, outras.length ? outras : null, outras.length ? "Veja também:" : null);
