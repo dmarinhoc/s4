@@ -37,7 +37,7 @@ PLANO DE CONTINGÊNCIA DE COMPRAS (usado só quando o sistema está indisponíve
 - Como o comprador compra no período sem sistema: por e-mail, seguindo as diretrizes do Plano de Contingência (cotação e formalização por e-mail com rastreabilidade, anexando propostas técnica/comercial e condições gerais). Documento completo: https://bracellsp.sharepoint.com/:b:/s/PROCUREMENT/IQBD7EipIbwnR49mLCSJgA2PAXYJlLXXv9Vpz07oPypFuss?e=0mhKDM
 - Fluxo completo: 1) Solicitante abre o Forms; 2) Auditoria/Controladoria/Key Users HANA aprovam; 3) Key User envia ao comprador; 4) comprador faz sourcing e formaliza por e-mail; 5) comprador libera portaria via RH Terceiros; 6) comprador emite o pedido no sistema após a liberação, com documentos comprobatórios.
 - Emissão do pedido após o sistema voltar: anexar o formulário aprovado, e-mail de formalização, propostas técnica e comercial, condições gerais e comprovante ao RH Terceiros; registrar nas observações que é oriundo do Plano de Contingência. A emissão no sistema é obrigatória.
-- A relação do que está em contingência é enviada semanalmente pela equipe do projeto.
+- A planilha/status das contingências é enviada 1x ao dia, no primeiro horário, permitindo ver se a demanda está com o gerente da área, com a Controladoria/comitê ou com o comprador, e fazer o follow-up. Líder da frente para questionamentos: Rodrigo Carvalho.
 
 DATAS / PRAZOS DO CUTOVER (ECC = sistema antigo). Todas as datas são limites "até". Atenção: existem TRÊS datas diferentes ligadas a NF — não confundir:
 - Cadastro (criação/ampliação/alteração) de BPs, materiais e serviços: até 28/05/2026.
@@ -88,6 +88,31 @@ DIVERGÊNCIA DE NF EM MATERIAL/SERVIÇO CRÍTICO DURANTE O FREEZING (período de
 - Se JÁ EXISTE pedido de compra emitido e a NF está com o time fiscal para lançamento: havendo divergência no pedido, o time de Task Force (Backlog NF) possui acesso às transações de alteração e atua diretamente na tratativa.
 - Se NÃO EXISTE pedido de compra e é necessário pagar o fornecedor: o alinhamento deve ser feito diretamente com o time financeiro, que orienta o procedimento adequado.
 - Para situações emergenciais: o requisitante formaliza a solicitação pelo formulário do Plano de Contingência.
+
+DELIBERAÇÕES DO S4 SYNC (reunião de 18/06/2026) — regras mais recentes, têm prioridade:
+
+Pedido emitido no ECC que NÃO foi aprovado, mas cuja contratação precisa ser formalizada com o fornecedor (inclui concorrência/cotação já feita):
+- NÃO criar novo Forms para esse caso. Usar o fluxo já conhecido: o analista de Suprimentos inclui no DocuSign o BID TAB (Bid Tab) e insere os aprovadores conforme a COA (alçada).
+- Após a aprovação no DocuSign, o comprador comunica o fornecedor.
+- Quando o SAP S/4HANA estiver liberado, o comprador cria o pedido no S/4 para formalização no sistema, anexando as evidências (Bid Tab, aprovações). Mantém governança e registro para auditoria.
+
+RCs com apontamento em contrato que NÃO geraram pedido:
+- A equipe de key user vai remover o vínculo do contrato nessas linhas e prosseguir com a migração das RCs.
+- No S/4 essas requisições seguem como COMPRA SPOT, sob responsabilidade do comprador/especialista de Suprimentos (o analista realiza a compra de forma spot).
+- Motivo de não migrar com o contrato vinculado: as RCs migram antes dos contratos e muitas estavam ligadas a contratos vencidos, bloqueados, sem saldo ou com valores/quantidades ultrapassados — manter o vínculo poderia gerar erro.
+- RCs de ESTOQUE não entram nesse processo; o MRP gera a demanda diretamente no S/4.
+
+Regra de migração de RC: migram as requisições emitidas e aprovadas a partir de 01/01/2026. RCs pendentes de aprovação não migram.
+
+Migração de pedidos e contratos: só podem ser extraídos do ECC a partir de 24/06 (após a entrada de notas até 23/06). A subida/migração está prevista a partir de 02/07, com conclusão prevista em 05/07. A validação em produção (se subiram corretos) só fica disponível após a conclusão das cargas, ~05/07. Principal risco: dependência das cargas predecessoras (material, BP/fornecedor, ampliação, centro de custo, ordem, PEP) — se não estiverem saneadas, a migração do documento de compra pode dar erro.
+
+Fluxo de contingência (detalhado): a contingência formaliza demandas urgentes durante a indisponibilidade/blackout. Passa pela aprovação da área/gestão e depois pelo comitê de contingência/Controladoria. Após aprovação completa, a demanda vai ao comprador indicado. Suprimentos NÃO compra antes da aprovação completa. Aprovação por e-mail do gerente NÃO substitui a aprovação formal no fluxo/formulário correto.
+
+Regularização pós-S/4:
+- Demanda que nasceu na contingência SEM RC: a área demandante deve criar a RC no S/4 para o comprador vincular/regularizar o pedido. Todo pedido precisa ter RC vinculada.
+- Se já havia RC aprovada no ECC e ela migrou: o comprador captura essa RC e gera o pedido no S/4 (caso diferente da contingência que nasceu sem RC).
+
+Sobre o próprio S4 Sync Agent: é um agente de IA criado para o time de SUPRIMENTOS tirar dúvidas recorrentes (blackout, contingência, key users, datas, regras). NÃO deve ser divulgado como canal geral para toda a companhia — o escopo é Suprimentos. Se o agente não souber responder, acionar o time do projeto para avaliar e incluir a resposta na base.
 `;
 
 const INSTRUCAO = `Você é o "S4 Sync Agent", assistente da migração SAP S/4HANA da Bracell, que ajuda os COMPRADORES com dúvidas. Responda SEMPRE em português do Brasil, de forma objetiva, prática e amigável, em frases curtas ou tópicos.

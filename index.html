@@ -265,7 +265,7 @@ const PERGUNTAS = [
   {
     pergunta: "O que está na contingência hoje?",
     chaves: "o que esta na contingencia, o que tem na contingencia, status atual, lista contingencia, contingencias abertas, o que ja foi aberto, o que esta aberto, situacao atual, painel contingencia, o que ta rolando, demandas em contingencia, fila contingencia, andamento contingencia",
-    resposta: "A relação do que está em contingência é <strong>enviada semanalmente</strong> pela equipe do projeto.\n\nPara dúvidas ou questionamentos sobre o que está em andamento, o líder dessa frente é o <strong>Rodrigo Carvalho</strong> — <a href=\"mailto:rocarvalho@bracell.com\">rocarvalho@bracell.com</a>.",
+    resposta: "A planilha/status das contingências é <strong>enviada 1x ao dia</strong>, no <strong>primeiro horário</strong>. Com ela dá pra ver se a demanda está com o gerente da área, com a Controladoria/comitê ou com o comprador, e fazer o follow-up.\n\nPara dúvidas sobre o que está em andamento, o líder dessa frente é o <strong>Rodrigo Carvalho</strong> — <a href=\"mailto:rocarvalho@bracell.com\">rocarvalho@bracell.com</a>.",
     categoria: "Contingência"
   },
   {
@@ -345,6 +345,126 @@ const PERGUNTAS = [
     chaves: "importacao, mro, zimp, pedido importacao, internacional, embarque, pagamento antecipado, importacoes, importado, exterior, maritimo, aereo",
     resposta: "Pontos sobre importações / MRO:\n\n• ~95% das importações são com <strong>pagamento antecipado</strong>\n• Pagamento ao fornecedor internacional p/ liberar embarque: até <strong>20/05/2026</strong>\n• Embarques aéreos: até <strong>30/05/2026</strong>\n• Embarques marítimos fora de curso ficam para a <strong>1ª quinzena de julho/2026</strong>\n\nAtenção a inconsistências comuns: tipo de pedido incorreto, divergência com a order confirmation e ZIMP alocado como compra nacional.",
     categoria: "Importação"
+  },
+  {
+    pergunta: "O que acontece com requisições com apontamento em contrato que não geraram pedido?",
+    chaves: "rc, contrato, migração, spot, nao, gerou, pedido",
+    resposta: "A decisão foi remover o vínculo do contrato dessas linhas e migrar as requisições. No S/4, elas seguirão como compra Spot, sob responsabilidade do comprador/especialista de Suprimentos.",
+    categoria: "Rc"
+  },
+  {
+    pergunta: "Por que essas RCs com contrato não foram simplesmente migradas com o contrato vinculado?",
+    chaves: "rc, contrato, erro, cutover, motivo, nao, migrar, com",
+    resposta: "Porque as requisições migram antes dos contratos e muitas estavam vinculadas a contratos vencidos, bloqueados, sem saldo, sem quantidade ou com valores/quantidades ultrapassados. Manter o vínculo poderia gerar erro ou apontar para contrato que não migrará corretamente.",
+    categoria: "Rc"
+  },
+  {
+    pergunta: "RCs de estoque entram nessa migração/desvinculação?",
+    chaves: "estoque, mrp, rc",
+    resposta: "Não. RCs de estoque não serão tratadas nesse processo; o MRP deve gerar a demanda diretamente no S/4.",
+    categoria: "Estoque"
+  },
+  {
+    pergunta: "Qual é a regra geral para RC migrar?",
+    chaves: "rc, migração, aprovação, regra, migracao",
+    resposta: "A regra mencionada é migrar requisições emitidas e aprovadas a partir de 01/01/2026. RCs pendentes de aprovação não entram na migração.",
+    categoria: "Rc"
+  },
+  {
+    pergunta: "Quando pedidos e contratos serão extraídos/migrados?",
+    chaves: "pedido, contrato, datas, migração",
+    resposta: "Pedidos e contratos só podem ser extraídos do ECC a partir de 24/06, após a entrada de notas até 23/06. A subida/migração está prevista a partir de 02/07, com conclusão prevista em 05/07.",
+    categoria: "Pedido"
+  },
+  {
+    pergunta: "Quando os usuários conseguirão validar se contratos e pedidos subiram corretamente?",
+    chaves: "validação, contrato, pedido, produção, validar, contratos, pedidos, migrados",
+    resposta: "A visualização/validação está prevista somente após a conclusão das cargas, em torno de 05/07. Antes do Go Live não haverá disponibilidade completa para validação em produção devido às dependências de cargas predecessoras.",
+    categoria: "Validação"
+  },
+  {
+    pergunta: "Qual é o principal risco da migração transacional?",
+    chaves: "risco, dados mestres, bp, material, migração, migracao, transacional",
+    resposta: "O principal risco é a dependência das cargas predecessoras, como material, BP/fornecedor, ampliação, centro de custo, ordem e PEP. Se esses dados não estiverem saneados/migrados, a ferramenta de migração pode apresentar erro no documento de compra.",
+    categoria: "Risco"
+  },
+  {
+    pergunta: "Como funciona a contingência?",
+    chaves: "contingência, aprovação, comprador, fluxo, contingencia",
+    resposta: "A contingência formaliza demandas urgentes durante a indisponibilidade/blackout. Ela passa por aprovação da área/gestão e depois pelo comitê de contingência/Controladoria. Após aprovação, a demanda é direcionada ao comprador indicado para iniciar o processo de compra.",
+    categoria: "Contingência"
+  },
+  {
+    pergunta: "Suprimentos compra antes da contingência ser aprovada?",
+    chaves: "contingência, aprovação, compra, antes, aprovacao, contingencia",
+    resposta: "Não. A compra só começa após a aprovação completa da contingência. Enquanto estiver pendente, a área solicitante deve acompanhar e cobrar o aprovador responsável.",
+    categoria: "Contingência"
+  },
+  {
+    pergunta: "Como acompanhar onde está parada a contingência?",
+    chaves: "contingência, status, follow-up, acompanhar, contingencia",
+    resposta: "Foi deliberado o envio diário da planilha/status das contingências no primeiro horário, permitindo identificar se está com o gerente da área, Controladoria/comitê ou comprador, e fazer o follow-up correto.",
+    categoria: "Contingência"
+  },
+  {
+    pergunta: "Aprovação por e-mail do gerente já libera a contingência?",
+    chaves: "contingência, forms, e-mail, aprovação, aprovacao, email, contingencia",
+    resposta: "Não. A aprovação precisa ocorrer no fluxo/formulário correto. Aprovação por e-mail não substitui a aprovação formal exigida para a contingência seguir.",
+    categoria: "Contingência"
+  },
+  {
+    pergunta: "O que fazer com concorrência já feita ou pedido do ECC que não foi aprovado antes do blackout?",
+    chaves: "ecc, pedido, bid tab, docusign, coa, nao, aprovado",
+    resposta: "A orientação é usar o Bid Tab e colher aprovação via DocuSign conforme COA/alçada aplicável. Após retorno do SAP, o pedido deve ser formalizado no sistema com as evidências anexadas.",
+    categoria: "Ecc"
+  },
+  {
+    pergunta: "Precisa criar um novo Forms para pedido não aprovado no ECC?",
+    chaves: "forms, bid tab, docusign, governança, pedido, nao, aprovado",
+    resposta: "Não foi aprovado criar novo Forms para esse caso. A deliberação foi usar o fluxo já conhecido de Bid Tab + DocuSign + COA, mantendo governança e registro para auditoria.",
+    categoria: "Forms"
+  },
+  {
+    pergunta: "Depois que o S/4 voltar, contingência sem RC precisará de RC?",
+    chaves: "s4, contingência, rc, pedido, regularizar, contingencia, sem",
+    resposta: "Sim. Para demandas que nasceram na contingência sem RC, a área demandante deverá criar a requisição no S/4 para que o comprador vincule/regularize o pedido. Foi reforçado que todo pedido precisa ter RC vinculada.",
+    categoria: "S4"
+  },
+  {
+    pergunta: "Se já havia RC aprovada no ECC, o que fazer no S/4?",
+    chaves: "ecc, s4, rc, pedido, migrada, gerar",
+    resposta: "Se a RC aprovada migrar para o S/4, o comprador deve capturar essa RC e gerar o pedido no S/4. Esse caso é diferente da contingência que nasceu sem RC.",
+    categoria: "Ecc"
+  },
+  {
+    pergunta: "O que é o S4/Sourcing Sync Agent?",
+    chaves: "agente, ia, faq, suprimentos, que, sync, agent",
+    resposta: "É um agente de IA/chat interativo criado para Suprimentos responder dúvidas recorrentes sobre blackout, contingência, key users, datas e regras do projeto S/4. Ele deve ser usado para reduzir acionamentos repetitivos ao time do projeto e à liderança.",
+    categoria: "Agente"
+  },
+  {
+    pergunta: "O agente pode ser compartilhado com toda a companhia?",
+    chaves: "agente, suprimentos, escopo, compartilhar, agent, companhia",
+    resposta: "Não. O agente foi criado para uso de Suprimentos e sua base de conhecimento está focada nos processos e dúvidas dessa área. Ele não deve ser divulgado como canal geral para toda a companhia.",
+    categoria: "Agente"
+  },
+  {
+    pergunta: "O que fazer se o agente não souber responder uma dúvida?",
+    chaves: "agente, base de conhecimento, suporte, agent, nao, responde",
+    resposta: "Acione o time do projeto para avaliar a dúvida e incluir a resposta na base de conhecimento do agente, quando aplicável.",
+    categoria: "Agente"
+  },
+  {
+    pergunta: "Ainda haverá novas turmas de treinamento?",
+    chaves: "treinamento, gravação, pedido de contrato, novos, treinamentos",
+    resposta: "Até o momento da reunião, os últimos treinamentos haviam sido realizados, incluindo treinamento de pedido de contrato com cerca de 48 participantes. As gravações e materiais devem ser revisitados por quem não conseguiu participar.",
+    categoria: "Treinamento"
+  },
+  {
+    pergunta: "Qual o papel das lideranças no período de cutover?",
+    chaves: "liderança, gestão da mudança, comunicação, cutover, papel, lideranca",
+    resposta: "As lideranças devem disseminar informações, dar visibilidade aos times, direcionar dúvidas para canais corretos, evitar boatos e trazer problemas de forma objetiva para solução. A presença da liderança é considerada mais efetiva do que apenas comunicados por e-mail.",
+    categoria: "Liderança"
   }
   /* ➕ Cole novas perguntas aqui, sempre com vírgula antes do { */
 ];
@@ -540,6 +660,37 @@ function htmlListaAreas(){
   return "Tenho Key Users / pontos focais nestas áreas. Toque em uma para ver quem são:";
 }
 
+/* ===== Busca de PESSOA por nome (ex.: "qual o e-mail da fulana") — sempre local ===== */
+const PESSOAS = [];
+for (const _area in KEYUSERS){
+  KEYUSERS[_area].forEach(function(_n){ PESSOAS.push({ nome: _n, area: _area, email: KU_EMAIL[_n] || "" }); });
+}
+const PESSOA_INTENT = ["email","e mail","e-mail","contato","telefone","falar com","quem e","quem eh","mail de","mail do","mail da","fone"];
+
+function buscarPessoas(texto){
+  const u = normalizar(texto);
+  const qtokens = u.split(" ").filter(function(t){ return t.length >= 3 && KU_STOP.indexOf(t) === -1; });
+  const res = [];
+  PESSOAS.forEach(function(p){
+    const nomeTokens = normalizar(p.nome).split(" ").filter(function(t){ return t.length >= 3; });
+    let score = 0;
+    nomeTokens.forEach(function(nt){ if (qtokens.indexOf(nt) !== -1) score += 1; });
+    if (score > 0) res.push({ p: p, score: score });
+  });
+  res.sort(function(a, b){ return b.score - a.score; });
+  return res;
+}
+
+function htmlPessoas(lista){
+  const linhas = lista.map(function(p){
+    const e = p.email
+      ? (" — <a href=\"mailto:" + p.email + "\">" + p.email + "</a>")
+      : " — <em>(e-mail não consta na base)</em>";
+    return "• <strong>" + p.nome + "</strong> <span style=\"color:var(--texto-suave)\">(" + p.area + ")</span>" + e;
+  }).join("\n");
+  return (lista.length > 1 ? "Encontrei estas pessoas:" : "Encontrei:") + "\n\n" + linhas;
+}
+
 /* ⬆️ FIM DA BASE DE PERGUNTAS — daqui pra baixo é o funcionamento ⬆️
    (não precisa mexer no resto, a não ser que queira mudar o comportamento)
    =================================================================== */
@@ -719,6 +870,16 @@ async function responder(texto){
     const segArea = buscarKeyUsers(texto);
     if (segArea){ animarResposta(htmlKeyUsers(segArea), null, null); return; }
     /* não reconheceu a área: segue o fluxo normal abaixo */
+  }
+
+  /* 1c) Pergunta por uma PESSOA pelo nome (ex.: "email da fulana") -> local, nunca vai à IA */
+  const pessoaIntent = PESSOA_INTENT.some(function(k){ return u.indexOf(k) !== -1; });
+  const pessoas = buscarPessoas(texto);
+  if (pessoas.length > 0 && (pessoas[0].score >= 2 || (pessoaIntent && pessoas[0].score >= 1))){
+    const topo = pessoas[0].score;
+    const escolhidos = pessoas.filter(function(x){ return x.score === topo; }).slice(0, 10).map(function(x){ return x.p; });
+    animarResposta(htmlPessoas(escolhidos), null, null);
+    return;
   }
 
   /* 2) Clique numa sugestão (texto = pergunta da base) -> resposta canônica instantânea */
