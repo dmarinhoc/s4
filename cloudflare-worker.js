@@ -219,7 +219,7 @@ export default {
     const payload = {
       systemInstruction: { parts: [{ text: INSTRUCAO + "\n\nCONTEXTO:\n" + CONHECIMENTO }] },
       contents: [{ role: "user", parts: [{ text: pergunta }] }],
-      generationConfig: { temperature: 0.2, maxOutputTokens: 600 }
+      generationConfig: { temperature: 0.2, maxOutputTokens: 1500 }
     };
 
     const diags = [];
