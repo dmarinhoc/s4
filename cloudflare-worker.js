@@ -113,6 +113,24 @@ Regularização pós-S/4:
 - Se já havia RC aprovada no ECC e ela migrou: o comprador captura essa RC e gera o pedido no S/4 (caso diferente da contingência que nasceu sem RC).
 
 Sobre o próprio S4 Sync Agent: é um agente de IA criado para o time de SUPRIMENTOS tirar dúvidas recorrentes (blackout, contingência, key users, datas, regras). NÃO deve ser divulgado como canal geral para toda a companhia — o escopo é Suprimentos. Se o agente não souber responder, acionar o time do projeto para avaliar e incluir a resposta na base.
+
+EMISSÃO DO PEDIDO EM CONTINGÊNCIA (passo a passo do comprador):
+1. O comprador cria o pedido no S/4HANA.
+2. Anexa ao pedido todos os documentos pertinentes e o e-mail com a solicitação/aprovação do plano de contingência.
+3. MEMORIZA o pedido (não salvar definitivamente ainda).
+4. Envia via Teams para a Jaqueline Prandini o número do pedido memorizado.
+5. A Jaqueline registra o pedido na tabela de exceção e retorna ao comprador autorizando a continuidade.
+6. Após o retorno, o comprador salva o pedido definitivamente e segue o fluxo normal.
+A estratégia/aprovação segue conforme a COA, sem alterações.
+
+RECEBIMENTO NO ALMOXARIFADO DURANTE O CUTOVER (bloqueios progressivos):
+- Datas: recebimento de materiais até 19/06/2026; entrada de nota fiscal até 23/06/2026; retorno do recebimento de materiais em 06/07/2026.
+- Blackout do recebimento: de 22/06 a 05/07/2026.
+Fluxos durante o blackout do recebimento:
+- LIBERADOS sem aprovação (recebidos normalmente): pedidos emergenciais ZEME criados previamente no ECC; e pedidos com saldo igual ou inferior ao ponto de ressuprimento, criados previamente no ECC.
+- Demanda emergencial NOVA: seguir o Plano de Contingência de Suprimentos — obrigatório preencher o formulário de formalização da demanda e atender a pelo menos um critério (risco à saúde/segurança; risco ao meio ambiente; impacto na produção; impacto financeiro relevante; risco à imagem; parada de produção). Após aprovação, o material é recebido no almoxarifado.
+- Pedido criado/aprovado no ECC que NÃO se enquadra nos casos acima: só pode ser recebido mediante e-mail de liberação. Modelo: Assunto "Liberação Emergencial Recebimento Blackout - NFe/Pedido/Fornecedor/Transportadora"; corpo com a justificativa; enviar para aprovação da Gerência da Área Solicitante e da Gestão dos Almoxarifados. (Os contatos da Gestão dos Almoxarifados aparecem no próprio assistente — oriente o usuário a digitar "gestão dos almoxarifados" ou "liberação emergencial recebimento".)
+- Importante: solicitações que não atendam aos critérios não serão recebidas durante o blackout.
 `;
 
 const INSTRUCAO = `Você é o "S4 Sync Agent", assistente da migração SAP S/4HANA da Bracell, que ajuda os COMPRADORES com dúvidas. Responda SEMPRE em português do Brasil, de forma objetiva, prática e amigável, em frases curtas ou tópicos.

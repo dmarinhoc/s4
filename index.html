@@ -275,10 +275,28 @@ const PERGUNTAS = [
     categoria: "Contingência"
   },
   {
-    pergunta: "Como emito o pedido depois que o sistema voltar?",
-    chaves: "emitir pedido, pedido pos contingencia, lancar pedido, regularizar, documentos comprobatorios, anexar, observacao pedido, oficializar pedido, regularizacao, pedido no sistema",
-    resposta: "Quando o S/4HANA voltar, o comprador emite o pedido e <strong>anexa todos os comprovantes</strong>:\n\n• Formulário de solicitação com as aprovações\n• E-mail de formalização com o fornecedor\n• Proposta técnica e comercial aprovadas\n• Condições gerais de fornecimento\n• Comprovante de envio ao RH Terceiros (se aplicável)\n\nNo campo de observações, registre:\n<em>\"Pedido emitido referente ao Plano de Contingência. Processo realizado em [data] durante período de indisponibilidade do sistema. Documentos comprobatórios anexados conforme procedimento vigente.\"</em>\n\n⚠️ A emissão no sistema é obrigatória — a contingência não substitui a formalização no sistema.",
+    pergunta: "Como o comprador emite o pedido em contingência?",
+    chaves: "emitir pedido, como emitir, pedido em contingencia, pedido pos contingencia, lancar pedido, memorizar, memorizacao, tabela de excecao, jaqueline, teams, regularizar, documentos comprobatorios, anexar, oficializar pedido, pedido no sistema",
+    resposta: "Fluxo de emissão do pedido em contingência:\n\n1. O comprador <strong>cria o pedido no S/4HANA</strong>.\n2. <strong>Anexa</strong> ao pedido: todos os documentos pertinentes + o <strong>e-mail com a solicitação/aprovação do plano de contingência</strong>.\n3. <strong>Memoriza o pedido</strong> (não salvar definitivamente ainda).\n4. Envia via <strong>Teams para a Jaqueline Prandini</strong> o <strong>número do pedido memorizado</strong>.\n5. A Jaqueline registra o pedido na <strong>tabela de exceção</strong> e retorna autorizando a continuidade.\n6. Após o retorno, o comprador <strong>salva o pedido definitivamente</strong> e segue o fluxo normal.\n\nA estratégia de aprovação segue conforme a <strong>COA</strong>, sem alterações.",
     categoria: "Contingência"
+  },
+  {
+    pergunta: "Recebimento no almoxarifado durante o blackout",
+    chaves: "recebimento almoxarifado, receber material blackout, recebimento blackout, almoxarifado blackout, zeme, ressuprimento, ponto de ressuprimento, recebimento durante cutover, posso receber material, recebimento liberado, recebimento de materiais",
+    resposta: "Durante o cutover há bloqueios progressivos no recebimento. <strong>Blackout do recebimento: 22/06 a 05/07/2026</strong>.\n\n<strong>Recebidos normalmente (sem aprovação):</strong>\n• Pedidos emergenciais <strong>ZEME</strong> criados previamente no ECC\n• Pedidos com saldo ≤ ponto de ressuprimento, criados previamente no ECC\n\n<strong>Demanda emergencial nova:</strong> seguir o Plano de Contingência de Suprimentos (formulário + atender ≥1 critério). Após aprovação, o material é recebido no almoxarifado.\n\n<strong>Pedido do ECC que não se enquadra acima:</strong> só com <strong>e-mail de liberação</strong> à Gerência da área + Gestão dos Almoxarifados (digite \"liberação emergencial recebimento\").\n\n❗ Solicitações fora dos critérios não serão recebidas no blackout.",
+    categoria: "Recebimento"
+  },
+  {
+    pergunta: "Datas limite de recebimento no almoxarifado",
+    chaves: "data recebimento, prazo recebimento, recebimento de materiais, ate quando receber material, retorno recebimento, data limite almoxarifado, quando volta recebimento, datas almoxarifado",
+    resposta: "Datas de recebimento no almoxarifado:\n\n• <strong>Recebimento de materiais:</strong> até 19/06/2026\n• <strong>Entrada de nota fiscal:</strong> até 23/06/2026\n• <strong>Retorno do recebimento de materiais:</strong> 06/07/2026\n\nNo blackout do recebimento (22/06 a 05/07) valem os fluxos contingenciais (ZEME, ressuprimento, contingência ou e-mail de liberação).",
+    categoria: "Recebimento"
+  },
+  {
+    pergunta: "Como pedir liberação emergencial de recebimento no blackout?",
+    chaves: "liberacao emergencial, liberar recebimento, email de liberacao, liberacao recebimento blackout, como liberar recebimento, modelo de email recebimento, aprovacao recebimento almoxarifado, liberacao emergencial recebimento",
+    resposta: "Para materiais com pedido já criado/aprovado no ECC que não se enquadram nos fluxos liberados, peça liberação por <strong>e-mail padrão</strong>:\n\n<strong>Assunto:</strong> Liberação Emergencial Recebimento Blackout - NFe/Pedido/Fornecedor/Transportadora\n<strong>Corpo:</strong> justificativa para o recebimento\n\n<strong>Enviar para (aprovação):</strong>\n1. Gerência da Área Solicitante\n2. Gestão dos Almoxarifados:\n• <strong>Flavio Augusto Ferreira dos Santos</strong> — <a href=\"mailto:fasantos1@bracell.com\">fasantos1@bracell.com</a>\n• <strong>Marcele Silva de Almeida</strong> — <a href=\"mailto:marcele_almeida@bracell.com\">marcele_almeida@bracell.com</a>\n• <strong>Helton Cesar Marques</strong> — <a href=\"mailto:helton_Marques@bracell.com\">helton_Marques@bracell.com</a>\n\n❗ Solicitações que não atendam aos critérios não serão recebidas no blackout.",
+    categoria: "Recebimento"
   },
   {
     pergunta: "Quais os pontos de atenção da contingência?",
@@ -533,7 +551,8 @@ const KEYUSERS = {
   "TI GRS": ["Denner de Andrade"],
   "TI MDM": ["Luiz Fernando Reginatto Martins","Alvaro Santos","Romulo Gimenez"],
   "TI QA": ["Leandro Gonçalves","Lucia Sasaki","Oswaldo Cerchiari","Valeska Torrezan Bitler","Douglas Marques Silva"],
-  "TI Perfis (acessos)": ["Jorge Albuquerque"]
+  "TI Perfis (acessos)": ["Jorge Albuquerque"],
+  "Gestão dos Almoxarifados": ["Flavio Augusto Ferreira dos Santos","Marcele Silva de Almeida","Helton Cesar Marques"]
 };
 
 /* e-mails conhecidos (Compras/Suprimentos) */
@@ -584,7 +603,10 @@ const KU_EMAIL = {
   "Lucia Sasaki": "progress.lsasaki@bracell.com",
   "Oswaldo Cerchiari": "cerchiari.ocerchiari@bracell.com",
   "Douglas Marques Silva": "cast.dsilva@bracell.com",
-  "Jorge Albuquerque": "iteam.jalbuquerque@bracell.com"
+  "Jorge Albuquerque": "iteam.jalbuquerque@bracell.com",
+  "Flavio Augusto Ferreira dos Santos": "fasantos1@bracell.com",
+  "Marcele Silva de Almeida": "marcele_almeida@bracell.com",
+  "Helton Cesar Marques": "helton_Marques@bracell.com"
 };
 
 /* sinônimos que apontam para uma área */
@@ -599,6 +621,7 @@ const KU_ALIAS = {
   "Produção Celulose": "producao celulose",
   "Produção Tissue": "producao tissue papel",
   "Almoxarifado": "almoxarifado estoque deposito",
+  "Gestão dos Almoxarifados": "gestao almoxarifado gestao dos almoxarifados liberacao recebimento blackout aprovacao recebimento liberar recebimento",
   "TI Perfis (acessos)": "acesso acessos perfil perfis autorizacao permissao"
 };
 
